@@ -1,5 +1,5 @@
 # wildberris-parser
-BETA!!! Can be errors!
+BETA!!! Can be errors! Soon update!
 
 # How to use 
 1. You have to dowload zip archive on top of this page and extract it. Then open popup.js and paste your tg bot token and your own chat ID in "YOUR_BOT TOKEN" and "YOUR_CHAT_ID".
