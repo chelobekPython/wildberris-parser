@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WB Parser</title>
+  <style>
+    body {
+      width: 400px;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      margin: 0;
+    }
+    .container {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+    .tabs {
+      display: flex;
+      background: rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .tab-button {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .tab-button.active {
+      background: rgba(255,255,255,0.2);
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    h1 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      text-align: center;
+      color: #fff;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+    button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      min-height: 20px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 10px 0;
+      display: none;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #66BB6A);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .success { background: rgba(76, 175, 80, 0.2); border-color: #4CAF50; }
+    .error { background: rgba(244, 67, 54, 0.2); border-color: #f44336; }
+    #logs {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #e0e0e0;
+    }
+    .log-entry {
+      margin-bottom: 5px;
+      padding: 2px 0;
+    }
+    .log-error { color: #ff6b6b; }
+    .log-success { color: #51cf66; }
+    .log-info { color: #74c0fc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-button active" data-tab="parse">Parse</button>
+      <button class="tab-button" data-tab="logs">Logs</button>
+    </div>
+
+    <div id="parse-tab" class="tab-content active">
+      <h1>Wildberries Parser</h1>
+
+      <div class="form-group">
+        <label for="pagesCount">Pages to parse:</label>
+        <input type="number" id="pagesCount" min="1" max="10" value="1">
+      </div>
+
+    <div class="form-group">
+      <label for="maxProducts">Max products per page:</label>
+      <input type="number" id="maxProducts" min="1" max="20" value="10">
+    </div>
+
+    <div class="form-group">
+      <label for="autoMonitor">
+        <input type="checkbox" id="autoMonitor"> Auto-monitor for new products
+      </label>
+    </div>
+
+    <div class="form-group" id="monitorSettings" style="display: none;">
+      <label for="monitorInterval">Check interval (minutes):</label>
+      <input type="number" id="monitorInterval" min="5" max="60" value="15">
+
+      <label for="maxPrice">Max price filter (₽):</label>
+      <input type="number" id="maxPrice" min="0" value="50000">
+    </div>
+
+    <button id="parseButton">Parse Products & Send to Telegram</button>
+    <button id="startMonitorButton" style="display: none;">Start Auto-Monitor</button>
+    <button id="stopMonitorButton" style="display: none;">Stop Auto-Monitor</button>
+    <button id="testMonitorButton" style="display: none; background: #ff9800;">Test Monitoring</button>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div id="status">Ready to parse Wildberries products</div>
+    </div>
+
+    <div id="logs-tab" class="tab-content">
+      <h1>Activity Logs</h1>
+      <div id="logs"></div>
+      <button id="clearLogsButton" style="margin-top: 10px; background: #ff6b6b;">Clear Logs</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

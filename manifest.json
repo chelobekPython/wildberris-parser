@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "WB Parser → Telegram",
+  "version": "1.0",
+  "description": "Парсит товары Wildberries и отправляет детали в Telegram",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "storage",
+    "notifications",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://api.telegram.org/*",
+    "https://www.wildberries.ru/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.wildberries.ru/catalog/*/detail.aspx*"],
+      "js": ["detail_content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
