@@ -342,8 +342,8 @@ function sendToTelegram(data) {
   log(`Message length: ${message.length} characters`);
   log(`Message preview: ${message.substring(0, 200)}...`);
 
-  const botToken = '8362095054:AAFdF2MZciT_AM2e4ks7Ajmrw4SU8YCDVnQ';
-  const chatId = '5196899473';
+  const botToken = 'PASTE_YOUR_TOKEN';
+  const chatId = 'PASTE_YOUR_ID';
 
   log(`Using bot token: ${botToken.substring(0, 10)}...`);
   log(`Using chat ID: ${chatId}`);
